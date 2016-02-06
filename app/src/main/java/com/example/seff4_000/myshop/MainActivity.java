@@ -1,8 +1,12 @@
 package com.example.seff4_000.myshop;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+
+import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,8 +27,39 @@ public class MainActivity extends AppCompatActivity {
         // Clean data
         cleandata();
 
+        //synchronize JSON to SQLite
+        synchronize ();
 
     }  //constructure
+
+    private void synchronize() {
+
+        StrictMode.ThreadPolicy myPolicy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(myPolicy);
+
+        int intTable = 1;
+        String tag = "Shop";
+
+        while (intTable <= 2) {
+            // กฏ1 create inputStream
+            InputStream objInputStream = null;
+            String strURLuser = "http://swiftcodingthai.com/6feb/php_get_data_SEFF.php";
+            String strURLfood = "http://swiftcodingthai.com/6feb/php_get_data_food.php";
+
+            try {
+
+            } catch (Exception e) {
+                Log.d(tag, "InputSttream ==>" + e.toString());
+            }
+
+            //2 create JSON String
+
+            //3 UpdateSQLite(เปลี่ยนสตริงเป็นข้อมูล แล้วอัพขึ้น SQLite)
+
+
+            intTable += 1;
+        }  //while
+    }  //synchronize
 
     private void cleandata() {
 
