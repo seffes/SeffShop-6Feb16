@@ -68,11 +68,34 @@ public class MainActivity extends AppCompatActivity {
         } else {
 
             // no Space ไม่มีช่องว่าง กรอกครบ
+            checkAuthen();
 
         } //if
 
 
     }  //clickLogin
+
+    private void checkAuthen() {
+
+        try {
+
+            String[] resultStrings = objMyManage.searchUser(userString);
+            if (passwordString.equals(resultStrings[2])) {
+                // Inseert to Service
+
+            } else {
+                Toast.makeText(MainActivity.this,
+                        "No Password",
+                        Toast.LENGTH_SHORT).show();
+
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this,
+                    "ไม่มี" + userString + "ในฐานข้อมูลของเรา",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void synJSONtoSQLite() {
 
