@@ -17,42 +17,46 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Explicit
+    //Explicit
     private MyManage objMyManage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // request database
+        //Request Database
         objMyManage = new MyManage(this);
 
-        // Test Add Value
-       // testAddValue();
+        //Test Add Value
+        //testAddValue();
 
-        // Clean data
-        cleandata();
+        //Clean data
+        cleanData();
 
-        //synchronize JSON to SQLite
-        synchronize ();
+        //Synchronize JSON to SQLite
+        synJSONtoSQLite();
 
-    }  //constructure
 
-    private void synchronize() {
+    }   // Main Method
 
-        StrictMode.ThreadPolicy myPolicy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+    private void synJSONtoSQLite() {
+
+        //Change Policy
+        StrictMode.ThreadPolicy myPolicy = new StrictMode.ThreadPolicy
+                .Builder().permitAll().build();
         StrictMode.setThreadPolicy(myPolicy);
 
         int intTable = 1;
-        String tag = "Shop";
+        String tag = "Restaurant";
 
         while (intTable <= 2) {
-            // กฏ1 create inputStream
+
+            //1. Create InputStream
             InputStream objInputStream = null;
             String strURLuser = "http://swiftcodingthai.com/6feb/php_get_data_SEFF.php";
             String strURLfood = "http://swiftcodingthai.com/6feb/php_get_data_food.php";
@@ -68,95 +72,99 @@ public class MainActivity extends AppCompatActivity {
                     case 2:
                         objHttpPost = new HttpPost(strURLfood);
                         break;
-                }  //switch
+                    default:
+                        break;
+                }   // switch
 
                 HttpResponse objHttpResponse = objHttpClient.execute(objHttpPost);
                 HttpEntity objHttpEntity = objHttpResponse.getEntity();
                 objInputStream = objHttpEntity.getContent();
 
+
             } catch (Exception e) {
-                Log.d(tag, "InputSttream ==>" + e.toString());
+                Log.d(tag, "InputStream ==> " + e.toString());
             }
 
 
-            //2 create JSON String
+            //2. Create JSON String
             String strJSON = null;
 
             try {
-                // ประมวลผล
+
                 BufferedReader objBufferedReader = new BufferedReader(new InputStreamReader(objInputStream, "UTF-8"));
                 StringBuilder objStringBuilder = new StringBuilder();
-                String strline = null;
+                String strLine = null;
 
-                // StringBuilder จะเป็นการตัดแบ่งส่วนเพื่อโยนไปเก็บ
-                while ((strline = objBufferedReader.readLine()) != null) {
-                    objStringBuilder.append(strline);
-                } //while
+                while ((strLine = objBufferedReader.readLine()) != null ) {
+                    objStringBuilder.append(strLine);
+                }   // while
 
                 objInputStream.close();
                 strJSON = objStringBuilder.toString();
 
             } catch (Exception e) {
-                Log.d(tag, "Inputstream ==> " + e.toString());
+                Log.d(tag, "strJSON ==> " + e.toString());
             }
 
-
-            //3 UpdateSQLite(เปลี่ยนสตริงเป็นข้อมูล แล้วอัพขึ้น SQLite)
+            //3. Update SQLite
             try {
 
                 JSONArray objJsonArray = new JSONArray(strJSON);
-                for (int i = 0; i < objJsonArray.length(); i++) {
+                for (int i=0;i<objJsonArray.length();i++) {
 
                     JSONObject jsonObject = objJsonArray.getJSONObject(i);
 
                     switch (intTable) {
                         case 1:
 
-                            //get value from userTable
-                            String strUser = jsonObject.getString(MyManage.column_User);
-                            String strPassword = jsonObject.getString(MyManage.column_Password);
-                            String strName = jsonObject.getString(MyManage.column_Name);
+                            //Get Value From userTABLE
+                            String strUser = jsonObject.getString(MyManage.column_user);
+                            String strPassword = jsonObject.getString(MyManage.column_pass);
+                            String strName = jsonObject.getString(MyManage.column_name);
 
-                            objMyManage.addNewValue(0, strUser, strPassword, strName); //ใช้ 0 เพราะในMyManage ใช้เลข0 เลือก
+                            objMyManage.addNewValue(0, strUser, strPassword, strName);
 
                             break;
-
                         case 2:
 
-                            //get value from food Table
-                            String strFood = jsonObject.getString(MyManage.column_Food);
-                            String strPrice = jsonObject.getString(MyManage.column_Price);
-                            String strSource = jsonObject.getString(MyManage.column_Source);
+                            //Get Value From foodTABLE
+                            String strFood = jsonObject.getString(MyManage.column_food);
+                            String strPrice = jsonObject.getString(MyManage.column_price);
+                            String strSource = jsonObject.getString(MyManage.column_source);
 
                             objMyManage.addNewValue(1, strFood, strPrice, strSource);
 
                             break;
-                    }
+                    }   //switch
 
-                }  //for
+                }   // for
+
 
             } catch (Exception e) {
                 Log.d(tag, "Update ==> " + e.toString());
             }
 
-            intTable += 1;
-        }  //while
-    }  //synchronize
 
-    private void cleandata() {
+
+            intTable += 1;
+        }   // while
+    }   // synJSONtoSQLite
+
+    private void cleanData() {
 
         SQLiteDatabase objSqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
                 MODE_PRIVATE, null);
-        objSqLiteDatabase.delete(MyManage.food_Table, null, null);
-        objSqLiteDatabase.delete(MyManage.user_Table, null, null);
+        objSqLiteDatabase.delete(MyManage.food_TABLE, null, null);
+        objSqLiteDatabase.delete(MyManage.user_TABLE, null, null);
 
-    }  // cleandata
+    }   //cleanData
 
     private void testAddValue() {
 
-        for (int i = 0; i <= 1; i++) {
+        for (int i=0;i<=1;i++) {
             objMyManage.addNewValue(i, "test1", "test2", "test3");
-        }  //for
+        }   //for
 
-    }  //testAddValue
-} //main class
+    }   // testAddValue
+
+}   // Main Class
